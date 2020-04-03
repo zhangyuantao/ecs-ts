@@ -1,19 +1,20 @@
 module ecs {
 	/**
 	 * ECS框架上下文，实体与系统的管理
+	 * Created by zhangyt
 	 */
 	export class Context {
 		public static instance: Context;
-
 		private entityMgr: EntityManager;
 		private systemMgr: SystemManager;
+		private isPaused: boolean;
 
-		public constructor() {
+		public constructor(maxComponents: number = 1000, fixedUpdateTime: number = 20) {
 			if (Context.instance)
 				throw "Context already instanced.";
 			let self = this;
-			self.entityMgr = new EntityManager();
-			self.systemMgr = new SystemManager();
+			self.entityMgr = new EntityManager(maxComponents);
+			self.systemMgr = new SystemManager(fixedUpdateTime);
 			Context.instance = self;
 		}
 
@@ -33,19 +34,24 @@ module ecs {
 			self.systems.start();
 		}
 
-		public update(timeStamp: number) {
+		public update(timestamp: number) {
 			let self = this;
-			self.systems.update(timeStamp);
+			if (self.isPaused)
+				return;
+
+			self.systems.update(timestamp);
 			self.systems.lateUpdate();
 		}
 
 		public pause() {
 			let self = this;
+			self.isPaused = true;
 			self.systems.pause();
 		}
 
 		public resume() {
 			let self = this;
+			self.isPaused = false;
 			self.systems.resume();
 		}
 

@@ -1,14 +1,14 @@
 module ecs {
 	/**
-	 * Entity管理
+	 * 实体管理
 	 * Created by zhangyt
 	 */
 	export class EntityManager {
 		// 自增实体id
 		private static EID: number = 0;
 
-		// 存放所有组件数据
-		private components: Array<IComponent>;
+		// 组件缓存池
+		private componentPool: Array<IComponent>;
 
 		// 实体集合，key:实体id value:实体数据		
 		private entities: { [key: number]: IEntity };
@@ -16,16 +16,24 @@ module ecs {
 		// 实体拥有的组件，key:实体id value:组件列表		 
 		private entityComponents: { [key: number]: Array<IComponent> };
 
-		public constructor() {
+		// 组件上限
+		private maxComponents: number;
+
+		public constructor(maxComponents: number) {
 			let self = this;
+			EntityManager.EID = 0;
+			self.maxComponents = maxComponents;
+			self.componentPool = [];
 			self.entities = {};
-			self.components = [];
+			self.entityComponents = {};
 		}
 
 		public destroy() {
 			let self = this;
+			self.maxComponents = 0;
 			self.entities = null;
-			self.components = null;
+			self.entityComponents = null;
+			self.componentPool = null;
 		}
 
 		/** Entity */
@@ -34,15 +42,21 @@ module ecs {
 			return EntityManager.EID++;
 		}
 
+		public getEntity(id: number) {
+			let self = this;
+			return self.entities[id];
+		}
+
 		public createEntity(name?: string) {
 			let self = this;
 			let entity = <IEntity>{};
 			entity.id = self.newEntityId;
-			entity.name = name;
+			entity.name = name ? name : `entity_${entity.id}`;
 			self.addEntity(entity);
+			return entity;
 		}
 
-		public addEntity(entity: IEntity) {
+		private addEntity(entity: IEntity) {
 			let self = this;
 			self.entities[entity.id] = entity;
 		}
@@ -52,10 +66,9 @@ module ecs {
 			let entity = self.entities[id];
 			if (entity) {
 				delete self.entities[id];
-
-				// 移除它的组件列表
-				self.removeComponents(id);
+				self.removeEntityComponents(id); // 移除它的组件列表
 			}
+			return self;
 		}
 
 		public removeAllEntities() {
@@ -65,44 +78,86 @@ module ecs {
 			}
 
 			self.entities = null;
-			self.components = null;
+			self.componentPool = null;
 			self.entityComponents = null
 		}
 
 		/** Component */
 
+		// 获取指定类型组件，返回第一个匹配组件
+		public getComponent<T>(entityId: number): IComponent {
+			let self = this;
+			let coms = self.entityComponents[entityId];
+			if (coms && coms.length > 0) {
+				for (let i = 0; i < coms.length; i++) {
+					if (coms[i] as T) return coms[i];
+				}
+			}
+			return null;
+		}
 
-		public getComponent<T>(entityId: number) {
-
+		// 获取指定类型组件，返回所有匹配组件
+		public getComponents<T>(entityId: number): IComponent[] {
+			let self = this;
+			let result = [];
+			let coms = self.entityComponents[entityId];
+			if (coms) {
+				for (let i = 0; i < coms.length; i++) {
+					if (coms[i] as T)
+						result.push(coms[i]);
+				}
+			}
+			return result;
 		}
 
 		public addComponent(entityId: number, com: IComponent) {
-
-		}
-
-		public removeAComponent(com: IComponent) {
 			let self = this;
-			let idx = self.components.indexOf(com);
-			if (idx != -1) {
-				self.components.splice(idx, 1);
-				
-				// 组件移除事件
-			}
+			if (!self.entityComponents[entityId])
+				self.entityComponents[entityId] = new Array<IComponent>();
+			self.entityComponents[entityId].push(com);
+			return self;
 		}
 
+		// 移除第一个匹配的指定组件
 		public removeComponent<T>(entityId: number) {
-
+			let self = this;
+			let coms = self.entityComponents[entityId];
+			if (coms) {
+				for (let i = 0; i < coms.length; i++) {
+					if (coms[i] as T) {
+						self.componentPool.push(coms[i]);
+						coms.splice(i, 1);
+						break;
+					}
+				}
+			}
+			return self;
 		}
 
-		public removeComponents(entityId: number) {
+		// 移除匹配的一组组件
+		public removeComponents<T>(entityId: number) {
 			let self = this;
-			let arr = self.entityComponents[entityId];
-
-			for (let i = 0; i < arr.length; ++i) {
-				self.removeAComponent(arr[i]);
+			let coms = self.entityComponents[entityId];
+			if (coms) {
+				for (let i = 0; i < coms.length; i++) {
+					if (coms[i] as T) {
+						self.componentPool.push(coms[i]);
+						coms.splice(i--, 1);
+					}
+				}
 			}
+			return self;
+		}
 
-			delete self.entityComponents[entityId];
+		// 移除实体上的所有组件
+		public removeEntityComponents(entityId: number) {
+			let self = this;
+			let coms = self.entityComponents[entityId];
+			if (coms) {
+				self.componentPool = self.componentPool.concat(coms);
+				self.entityComponents[entityId] = [];
+			}
+			return self;
 		}
 	}
 }

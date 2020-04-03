@@ -16,19 +16,26 @@ namespace ecs.example {
 
             egret.lifecycle.onPause = () => {
                 self.context.pause();
+                egret.ticker.pause();
                 console.log("lifecycle-onPause");
             };
 
             egret.lifecycle.onResume = () => {
                 self.context.resume();
+                egret.ticker.resume();
                 console.log("lifecycle-onResume");
             };
 
             self.context = new ecs.Context();
-            self.context.systems
-            .add({})
-            .add({})
-            .add({});
+            // self.context.systems
+            // .add({})
+            // .add({})
+            // .add({});            
+            self.context.initialize();
+            let entity = self.context.entities.createEntity("player");
+            self.context.entities
+            .addComponent(entity.id, <IComponent>{})
+            .addComponent(entity.id, <IComponent>{})
         }
 
         public dispose() {
@@ -38,12 +45,6 @@ namespace ecs.example {
             let idx = egret.lifecycle.contexts.indexOf(self.lifecycle);
             idx != -1 && egret.lifecycle.contexts.splice(idx, 1);
             self.lifecycle = null;
-        }
-
-        public onTick(timestamp: number) {
-            let self = this;
-            self.context.update(timestamp);
-            return false;
         }
     }
 }

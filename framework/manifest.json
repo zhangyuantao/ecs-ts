@@ -9,8 +9,25 @@
 		"libs/modules/promise/promise.js"
 	],
 	"game": [
+		"bin-debug/ecs/system/interface/IAwakeSystem.js",
 		"bin-debug/LoadingUI.js",
+		"bin-debug/Platform.js",
+		"bin-debug/ecs/Context.js",
+		"bin-debug/ecs/component/IComponent.js",
+		"bin-debug/ecs/component/ISingletonComponent.js",
+		"bin-debug/ecs/entity/EntitiyMgr.js",
+		"bin-debug/ecs/entity/IEntity.js",
+		"bin-debug/ecs/system/SystemMgr.js",
+		"bin-debug/ecs/system/UtilityFunction .js",
 		"bin-debug/Main.js",
-		"bin-debug/Platform.js"
+		"bin-debug/ecs/system/interface/IDestroySystem.js",
+		"bin-debug/ecs/system/interface/ILateUpdateSystem.js",
+		"bin-debug/ecs/system/interface/IPauseSystem.js",
+		"bin-debug/ecs/system/interface/IReactiveSystem.js",
+		"bin-debug/ecs/system/interface/IResumeSystem.js",
+		"bin-debug/ecs/system/interface/IStartSystem.js",
+		"bin-debug/ecs/system/interface/ISystem.js",
+		"bin-debug/ecs/system/interface/IUpdateSystem.js",
+		"bin-debug/example/ECSExample.js"
 	]
 }

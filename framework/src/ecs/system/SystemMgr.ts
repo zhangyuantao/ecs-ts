@@ -1,7 +1,9 @@
 module ecs {
+	/**
+	 * 系统管理
+	 * Created by zhangyt
+	 */
 	export class SystemManager {
-		public readonly FixedUpdateTime: number = 20;
-
 		private awakeSystems: Array<IAwakeSystem>;
 		private startSystems: Array<IStartSystem>;
 		private updateSystems: Array<IUpdateSystem>;
@@ -9,12 +11,13 @@ module ecs {
 		private pauseSystems: Array<IPauseSystem>;
 		private resumeSystems: Array<IResumeSystem>;
 		private destroySystems: Array<IDestroySystem>;
-
+		private fixedUpdateTime: number = 20;
 		private lastUpdateTime: number = 0;
 		private fixedSimulationTime: number = 0;
 
-		public constructor() {
+		public constructor(fixedUpdateTime:number) {
 			let self = this;
+			self.fixedUpdateTime = fixedUpdateTime;
 			self.awakeSystems = new Array<IAwakeSystem>();
 			self.startSystems = new Array<IStartSystem>();
 			self.updateSystems = new Array<IUpdateSystem>();
@@ -74,7 +77,7 @@ module ecs {
 
 				// fixedUpdate
 				while (self.fixedSimulationTime < timestamp) {
-					self.fixedSimulationTime += self.FixedUpdateTime;
+					self.fixedSimulationTime += self.fixedUpdateTime;
 					sys.fixedUpdate(dt);
 				}
 

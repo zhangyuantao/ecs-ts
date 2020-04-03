@@ -1,4 +1,3 @@
 module ecs {
-	export interface ISystem {
-	}
+	export interface ISystem { }
 }
