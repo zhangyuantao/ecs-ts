@@ -3,19 +3,43 @@ module ecs {
 	 * ECS框架上下文，实体与系统的管理
 	 * Created by zhangyt
 	 */
-	export class Context {
-		public static instance: Context;
+	export class World {
+		public static instances: { [key: string]: World };
+		public static active: string;
+
+		public name: string;
 		private entityMgr: EntityManager;
 		private systemMgr: SystemManager;
 		private isPaused: boolean;
 
-		public constructor(maxComponents: number = 1000, fixedUpdateTime: number = 20) {
-			if (Context.instance)
-				throw "Context already instanced.";
+		public constructor(name: string, maxComponents: number = 1000, fixedUpdateTime: number = 20) {
 			let self = this;
+			if (!World.instances)
+				World.instances = {};
+			if (!name || name == "")
+				throw "invalid world name:" + name;
+			if (World.instances[name])
+				throw "World:" + name + " already existed.";
+			World.instances[name] = self;
+
+			self.name = name;
 			self.entityMgr = new EntityManager(maxComponents);
 			self.systemMgr = new SystemManager(fixedUpdateTime);
-			Context.instance = self;
+		}
+
+		public static getInstance(name: string) {
+			return World.instances[name];
+		}
+
+		public static getActive() {
+			let name = World.active;
+			if (!name) {
+				for (let key in World.instances) {
+					name = key;
+					break;
+				}
+			}
+			return World.getInstance(name);
 		}
 
 		public get entities() {
@@ -61,7 +85,7 @@ module ecs {
 			self.systemMgr.destroy();
 			self.entityMgr = null;
 			self.systemMgr = null;
-			Context.instance = null;
+			World.instances = null;
 		}
 	}
 }

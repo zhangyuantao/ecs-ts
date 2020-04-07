@@ -1,6 +1,6 @@
 namespace ecs.example {
     export class ECSExample {
-        public context: ecs.Context;
+        public world: ecs.World;
         public lifecycle: egret.lifecycle.LifecycleContext;
 
         public constructor() {
@@ -8,40 +8,46 @@ namespace ecs.example {
             egret.lifecycle.addLifecycleListener((lifecycle) => {
                 self.lifecycle = lifecycle;
                 lifecycle.onUpdate = () => {
-                    self.context.update(egret.getTimer());
+                    self.world.update(egret.getTimer());
                     console.log("lifecycle-onUpdate");
                 }
             });
 
 
             egret.lifecycle.onPause = () => {
-                self.context.pause();
+                self.world.pause();
                 egret.ticker.pause();
                 console.log("lifecycle-onPause");
             };
 
             egret.lifecycle.onResume = () => {
-                self.context.resume();
+                self.world.resume();
                 egret.ticker.resume();
                 console.log("lifecycle-onResume");
             };
 
-            self.context = new ecs.Context();
+            self.world = new ecs.World("default");
             // self.context.systems
             // .add({})
             // .add({})
             // .add({});            
-            self.context.initialize();
-            let entity = self.context.entities.createEntity("player");
-            self.context.entities
-            .addComponent(entity.id, <IComponent>{})
-            .addComponent(entity.id, <IComponent>{})
+            self.world.initialize();
+            let entity = self.world.entities.createEntity("player");
+            self.world.entities.addComponent(entity.id, Components.MoveComponent, () => {
+                return <IMoveComponent>{
+                    type: Components.MoveComponent,
+                    x: 0,
+                    y: 0,
+                    rotation: 0
+                }
+            });
+
         }
 
         public dispose() {
             let self = this;
-            self.context.destroy();
-            
+            self.world.destroy();
+
             let idx = egret.lifecycle.contexts.indexOf(self.lifecycle);
             idx != -1 && egret.lifecycle.contexts.splice(idx, 1);
             self.lifecycle = null;

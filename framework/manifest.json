@@ -12,7 +12,7 @@
 		"bin-debug/ecs/system/interface/IAwakeSystem.js",
 		"bin-debug/LoadingUI.js",
 		"bin-debug/Platform.js",
-		"bin-debug/ecs/Context.js",
+		"bin-debug/ecs/World.js",
 		"bin-debug/ecs/component/IComponent.js",
 		"bin-debug/ecs/component/ISingletonComponent.js",
 		"bin-debug/ecs/entity/EntitiyMgr.js",
@@ -28,6 +28,7 @@
 		"bin-debug/ecs/system/interface/IStartSystem.js",
 		"bin-debug/ecs/system/interface/ISystem.js",
 		"bin-debug/ecs/system/interface/IUpdateSystem.js",
+		"bin-debug/example/Components.js",
 		"bin-debug/example/ECSExample.js"
 	]
 }

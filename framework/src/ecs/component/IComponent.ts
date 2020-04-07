@@ -1,3 +1,5 @@
 module ecs {
-	export interface IComponent { }
+	export interface IComponent {
+		type: number;
+	}
 }
