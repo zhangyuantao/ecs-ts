@@ -7,6 +7,7 @@ module ecs {
 		private awakeSystems: Array<IAwakeSystem>;
 		private startSystems: Array<IStartSystem>;
 		private updateSystems: Array<IUpdateSystem>;
+		private fixedUpdateSystems: Array<IFixedUpdateSystem>;
 		private lateUpdateSystems: Array<ILateUpdateSystem>;
 		private pauseSystems: Array<IPauseSystem>;
 		private resumeSystems: Array<IResumeSystem>;
@@ -15,12 +16,13 @@ module ecs {
 		private lastUpdateTime: number = 0;
 		private fixedSimulationTime: number = 0;
 
-		public constructor(fixedUpdateTime:number) {
+		public constructor(fixedUpdateTime: number) {
 			let self = this;
 			self.fixedUpdateTime = fixedUpdateTime;
 			self.awakeSystems = new Array<IAwakeSystem>();
 			self.startSystems = new Array<IStartSystem>();
 			self.updateSystems = new Array<IUpdateSystem>();
+			self.fixedUpdateSystems = new Array<IFixedUpdateSystem>();
 			self.lateUpdateSystems = new Array<ILateUpdateSystem>();
 			self.pauseSystems = new Array<IPauseSystem>();
 			self.resumeSystems = new Array<IResumeSystem>();
@@ -37,6 +39,9 @@ module ecs {
 
 			let updateSys = sys as IUpdateSystem;
 			if (updateSys) self.updateSystems.push(updateSys);
+
+			let fixedUpdateSys = sys as IFixedUpdateSystem;
+			if (fixedUpdateSys) self.fixedUpdateSystems.push(fixedUpdateSys);
 
 			let lateUpdateSys = sys as ILateUpdateSystem;
 			if (lateUpdateSys) self.lateUpdateSystems.push(lateUpdateSys);
@@ -72,16 +77,17 @@ module ecs {
 			let dt = timestamp - self.lastUpdateTime;
 			self.lastUpdateTime = timestamp;
 
-			for (let i = 0; i < self.updateSystems.length; i++) {
-				let sys = self.updateSystems[i];
-
-				// fixedUpdate
+			// fixedUpdate
+			for (let i = 0; i < self.fixedUpdateSystems.length; i++) {
+				let sys = self.fixedUpdateSystems[i];
 				while (self.fixedSimulationTime < timestamp) {
 					self.fixedSimulationTime += self.fixedUpdateTime;
 					sys.fixedUpdate(dt);
 				}
+			}
 
-				sys.update(dt);
+			for (let i = 0; i < self.updateSystems.length; i++) {
+				self.updateSystems[i].update(dt);
 			}
 		}
 
