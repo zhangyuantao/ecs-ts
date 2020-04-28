@@ -9,26 +9,26 @@
 		"libs/modules/promise/promise.js"
 	],
 	"game": [
-		"bin-debug/ecs/system/interface/IAwakeSystem.js",
+		"bin-debug/ecs/system/interface/IDestroySystem.js",
 		"bin-debug/LoadingUI.js",
 		"bin-debug/Platform.js",
+		"bin-debug/ecs/Context.js",
+		"bin-debug/ecs/Group.js",
+		"bin-debug/ecs/Matcher.js",
+		"bin-debug/ecs/UtilityFunction .js",
 		"bin-debug/ecs/World.js",
 		"bin-debug/ecs/component/IComponent.js",
-		"bin-debug/ecs/component/ISingletonComponent.js",
-		"bin-debug/ecs/entity/EntitiyMgr.js",
-		"bin-debug/ecs/entity/IEntity.js",
-		"bin-debug/ecs/system/SystemMgr.js",
-		"bin-debug/ecs/system/UtilityFunction .js",
+		"bin-debug/ecs/system/Systems.js",
 		"bin-debug/Main.js",
-		"bin-debug/ecs/system/interface/IDestroySystem.js",
+		"bin-debug/ecs/system/interface/IInitializeSystem.js",
 		"bin-debug/ecs/system/interface/ILateUpdateSystem.js",
 		"bin-debug/ecs/system/interface/IPauseSystem.js",
 		"bin-debug/ecs/system/interface/IReactiveSystem.js",
-		"bin-debug/ecs/system/interface/IResumeSystem.js",
-		"bin-debug/ecs/system/interface/IStartSystem.js",
+		"bin-debug/ecs/system/interface/ISingletonComponent.js",
 		"bin-debug/ecs/system/interface/ISystem.js",
 		"bin-debug/ecs/system/interface/IUpdateSystem.js",
-		"bin-debug/example/Components.js",
-		"bin-debug/example/ECSExample.js"
+		"bin-debug/example/ComponentDefine.js",
+		"bin-debug/example/ECSExample.js",
+		"bin-debug/example/SystemDefine.js"
 	]
 }

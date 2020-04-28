@@ -8,23 +8,32 @@ module ecs {
 		public static active: string;
 
 		public name: string;
-		private entityMgr: EntityManager;
-		private systemMgr: SystemManager;
+		private ctx: Context;
+		private sys: Systems;
 		private isPaused: boolean;
+		private updatePauseEnable: boolean;
+		private lastUpdateTime: number = 0;
 
-		public constructor(name: string, maxComponents: number = 1000, fixedUpdateTime: number = 20) {
+		/**
+		 * @param name 取个名字
+		 * @param updatePauseEnable update是否开启暂停
+		 * @param fixedUpdateTime fixedUpdat频率
+		 * @param maxComponents 最大组件数
+		 */
+		public constructor(name: string, updatePauseEnable: boolean = false, fixedUpdateTime: number = 20, maxComponents: number = 1000) {
 			let self = this;
 			if (!World.instances)
 				World.instances = {};
 			if (!name || name == "")
-				throw "invalid world name:" + name;
+				throw "invalid Context name:" + name;
 			if (World.instances[name])
-				throw "World:" + name + " already existed.";
+				throw "Context:" + name + " already existed.";
 			World.instances[name] = self;
 
 			self.name = name;
-			self.entityMgr = new EntityManager(maxComponents);
-			self.systemMgr = new SystemManager(fixedUpdateTime);
+			self.updatePauseEnable = updatePauseEnable;
+			self.ctx = new Context(maxComponents);
+			self.sys = new Systems(fixedUpdateTime);
 		}
 
 		public static getInstance(name: string) {
@@ -42,49 +51,50 @@ module ecs {
 			return World.getInstance(name);
 		}
 
-		public get entities() {
+		public get context() {
 			let self = this;
-			return self.entityMgr;
+			return self.ctx;
 		}
 
 		public get systems() {
 			let self = this;
-			return self.systemMgr;
+			return self.sys;
 		}
 
 		public initialize() {
 			let self = this;
-			self.systems.awake();
-			self.systems.start();
+			self.sys.init();
 		}
 
 		public update(timestamp: number) {
 			let self = this;
-			if (self.isPaused)
-				return;
+			let dt = timestamp - (self.lastUpdateTime || timestamp);
+			self.lastUpdateTime = timestamp;
 
-			self.systems.update(timestamp);
-			self.systems.lateUpdate();
+			if (!self.isPaused || !self.updatePauseEnable) {
+				self.sys.update(dt);
+				self.sys.lateUpdate();
+			}
 		}
 
 		public pause() {
 			let self = this;
 			self.isPaused = true;
-			self.systems.pause();
+			self.sys.pause();
 		}
 
 		public resume() {
 			let self = this;
 			self.isPaused = false;
-			self.systems.resume();
+			self.sys.resume();
 		}
 
 		public destroy() {
 			let self = this;
-			self.entityMgr.destroy();
-			self.systemMgr.destroy();
-			self.entityMgr = null;
-			self.systemMgr = null;
+			self.ctx.destroy();
+			self.sys.destroy();
+			self.ctx = null;
+			self.sys = null;
 			World.instances = null;
 		}
 	}

@@ -9,7 +9,6 @@ namespace ecs.example {
                 self.lifecycle = lifecycle;
                 lifecycle.onUpdate = () => {
                     self.world.update(egret.getTimer());
-                    console.log("lifecycle-onUpdate");
                 }
             });
 
@@ -27,13 +26,10 @@ namespace ecs.example {
             };
 
             self.world = new ecs.World("default");
-            // self.context.systems
-            // .add({})
-            // .add({})
-            // .add({});            
+            self.world.systems.add(new MoveSystem());
             self.world.initialize();
-            let entity = self.world.entities.createEntity("player");
-            self.world.entities.addComponent(entity.id, Components.MoveComponent, () => {
+            let entity = self.world.context.createEntity();
+            self.world.context.addComponent(entity, Components.MoveComponent, () => {
                 return <IMoveComponent>{
                     type: Components.MoveComponent,
                     x: 0,

@@ -1,6 +1,6 @@
 module ecs.example {
 
-	export class MoveSystem implements IAwakeSystem, IUpdateSystem {
+	export class MoveSystem implements IInitializeSystem, IUpdateSystem {
 		/**
 		 * name
 		 */
@@ -10,17 +10,21 @@ module ecs.example {
 		}
 
 		/** implements */
-		
-		public awake() {
 
+		public awake() {
+			console.log("awake");
+		}
+
+		public start() {
+			console.log("start");
 		}
 
 		public fixedUpdate(dt: number) {
-
+			console.log("fixedUpdate:", dt);
 		}
 
 		public update(dt: number) {
-
+			console.log("update:", dt);
 		}
 	}
 }

@@ -6,6 +6,6 @@ module ecs {
 		activate();
 		deactivate();
 		clear();
-		execute(entities:IEntity[]);
+		execute(entities:number[]);
 	}
 }
