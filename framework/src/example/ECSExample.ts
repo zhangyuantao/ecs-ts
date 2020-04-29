@@ -1,6 +1,6 @@
 namespace ecs.example {
     export class ECSExample {
-        public world: ecs.World;
+        public gameCtrl: ecs.example.GameCtrl;
         public lifecycle: egret.lifecycle.LifecycleContext;
 
         public constructor() {
@@ -8,28 +8,29 @@ namespace ecs.example {
             egret.lifecycle.addLifecycleListener((lifecycle) => {
                 self.lifecycle = lifecycle;
                 lifecycle.onUpdate = () => {
-                    self.world.update(egret.getTimer());
+                    self.gameCtrl.update(egret.getTimer());
                 }
             });
 
 
             egret.lifecycle.onPause = () => {
-                self.world.pause();
+                self.gameCtrl.pause();
                 egret.ticker.pause();
                 console.log("lifecycle-onPause");
             };
 
             egret.lifecycle.onResume = () => {
-                self.world.resume();
+                self.gameCtrl.resume();
                 egret.ticker.resume();
                 console.log("lifecycle-onResume");
             };
 
-            self.world = new ecs.World("default");
-            self.world.systems.add(new MoveSystem());
-            self.world.initialize();
-            let entity = self.world.context.createEntity();
-            self.world.context.addComponent(entity, Components.MoveComponent, () => {
+            self.gameCtrl = new ecs.example.GameCtrl(Contexts.instance, true);
+            self.gameCtrl.addSystem(new MoveSystem(Contexts.instance));
+            self.gameCtrl.initialize();
+
+            let entity = Contexts.instance.game.createEntity();
+            Contexts.instance.game.addComponent(entity, Components.MoveComponent, () => {
                 return <IMoveComponent>{
                     type: Components.MoveComponent,
                     x: 0,
@@ -42,7 +43,8 @@ namespace ecs.example {
 
         public dispose() {
             let self = this;
-            self.world.destroy();
+            Contexts.instance.destroy();
+            self.gameCtrl.destroy();
 
             let idx = egret.lifecycle.contexts.indexOf(self.lifecycle);
             idx != -1 && egret.lifecycle.contexts.splice(idx, 1);

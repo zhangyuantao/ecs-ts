@@ -1,9 +1,13 @@
 module ecs.example {
 
 	export class MoveSystem implements IInitializeSystem, IUpdateSystem {
-		/**
-		 * name
-		 */
+		private contexts:Contexts;
+
+		public constructor(ctxs:Contexts){
+			let self = this;			 
+			self.contexts = ctxs;
+		}
+
 		public move() {
 
 
